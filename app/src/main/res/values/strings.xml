@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">TractiveTest</string>
+
+    <string name="title_home">Home</string>
+    <string name="desc_img_back">Back</string>
+    <string name="desc_img_home">Home</string>
+    <string name="err_pet_lost">We lost him, he\'s gone :(</string>
+</resources>
