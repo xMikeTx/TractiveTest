@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -44,19 +46,49 @@ fun HomeComponent(navController: NavHostController) {
 }
 
 /**
- * entry point for Hit view UI page
+ * Home view
  * @param navController navigation controller to enable forward navigation
  * @param callResult result of a call for data
  * @param refresh handle to call data refresh
  */
 @Composable
 private fun HomePage(navController: NavHostController, callResult: State<CallResult<Int>>, refresh: () -> Unit) {
-    ConstraintLayout(modifier = Modifier.fillMaxWidth().aspectRatio(1f)) {
+    Column(modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally) {
+        callResult.value.let {
+            when (it.status) {
+                CallResult.Status.SUCCESS -> {
+                    ProximityView(distance = it.data)
+                }
+                CallResult.Status.LOADING, CallResult.Status.IDLE -> {
+                    LoadingView()
+                }
+                CallResult.Status.ERROR -> {
+                    Text(
+                        text = stringResource(R.string.err_pet_lost),
+                        style = TextStyle(color = TextError)
+                    )
+                }
+            }
+        }
+
+        Text(
+            modifier = Modifier.padding(10.dp),
+            text = stringResource(R.string.lbl_explanation)
+        )
+    }
+}
+
+@Composable
+private fun ProximityView(distance: Int?) {
+    ConstraintLayout(modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(1f)) {
         val (image) = createRefs()
         Image(painter = painterResource(id = R.drawable.ic_pet),
             contentDescription = stringResource(id = R.string.desc_img_home),
             modifier = Modifier
-                .size(128.dp)
+                .size(dimensionResource(id = R.dimen.imageSize))
                 .clip(CircleShape)
                 .background(Teal200)
                 .constrainAs(image) {
@@ -65,53 +97,35 @@ private fun HomePage(navController: NavHostController, callResult: State<CallRes
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
-        callResult.value.let {
-            when (it.status) {
-                CallResult.Status.SUCCESS -> {
-                    val position = it.data?.div(5) ?: 0
-                    for (i: Int in 1..position) {
-                        Box(modifier = Modifier
-                            .clip(CircleShape)
-                            .border(2.dp, Proximity, CircleShape)
-                            .background(Color.Transparent)
-                            .constrainAs(createRef()) {
-                                top.linkTo(image.top, (-10 * i).dp)
-                                bottom.linkTo(image.bottom, (-10 * i).dp)
-                                start.linkTo(image.start, (-10 * i).dp)
-                                end.linkTo(image.end, (-10 * i).dp)
-                                width = Dimension.fillToConstraints
-                                height = Dimension.fillToConstraints
-                            })
-                    }
-                }
-                CallResult.Status.LOADING, CallResult.Status.IDLE -> {
-                    LoadingItem()
-                }
-                CallResult.Status.ERROR -> {
-                    Text(
-                        text = stringResource(R.string.err_pet_lost),
-                        modifier = Modifier.fillMaxWidth(),
-                        style = TextStyle(color = TextError)
-                    )
-                }
-            }
+        val dividedDistance = distance?.div(5) ?: 0
+        for (i: Int in 1..dividedDistance) {
+            Box(modifier = Modifier
+                .clip(CircleShape)
+                .border(2.dp, Proximity, CircleShape)
+                .background(Color.Transparent)
+                .constrainAs(createRef()) {
+                    top.linkTo(image.top, (-10 * i).dp)
+                    bottom.linkTo(image.bottom, (-10 * i).dp)
+                    start.linkTo(image.start, (-10 * i).dp)
+                    end.linkTo(image.end, (-10 * i).dp)
+                    width = Dimension.fillToConstraints
+                    height = Dimension.fillToConstraints
+                })
         }
     }
 }
 
-/**
- * Component that composes a proximity circle
- */
 @Composable
-private fun ProximityIndicator(position: Int) {
-
-}
-
-/**
- * Component that shows a skeleton loading
- */
-@Composable
-private fun LoadingItem() {
+private fun LoadingView() {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .aspectRatio(1f)){
+        CircularProgressIndicator(modifier = Modifier
+            .size(dimensionResource(id = R.dimen.imageSize))
+            .align(Alignment.Center)
+            .clip(CircleShape)
+            .background(Teal200))
+    }
 
 }
 
@@ -133,5 +147,20 @@ private fun PagePreview() {
 @Preview(showBackground = true)
 @Composable
 private fun LoadPreview() {
-    LoadingItem()
+    val state = produceState(initialValue = CallResult.loading(1)) {
+        value = CallResult.loading()
+    }
+    HomePage(rememberNavController(), state) {}
+}
+
+/**
+ * Preview of error component
+ */
+@Preview(showBackground = true)
+@Composable
+private fun ErrorPreview() {
+    val state = produceState(initialValue = CallResult.error<Int>()) {
+        value = CallResult.error()
+    }
+    HomePage(rememberNavController(), state) {}
 }

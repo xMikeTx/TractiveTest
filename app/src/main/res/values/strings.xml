@@ -5,4 +5,5 @@
     <string name="desc_img_back">Back</string>
     <string name="desc_img_home">Home</string>
     <string name="err_pet_lost">We lost him, he\'s gone :(</string>
+    <string name="lbl_explanation">As you get closer to your pet, you\'ll see more rings to pinpoint your pet\'s location</string>
 </resources>

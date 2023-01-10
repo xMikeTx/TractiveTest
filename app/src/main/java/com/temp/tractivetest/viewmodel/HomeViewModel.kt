@@ -21,12 +21,12 @@ class HomeViewModel @Inject constructor(
         const val MAX_PET_POS = 30
     }
 
-    private val hitListFlow = RefreshFlow {
+    private val positionFLow = RefreshFlow {
         dataSource.getPetPosition()
     }
 
     //pet position call will return distance, we have to invert it to get proximity
-    val position = hitListFlow.data.map {
+    val position = positionFLow.data.map {
         it.copyConvert { number ->
             number?.let {
                 abs(MAX_PET_POS - number)
@@ -34,5 +34,5 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun refresh() = hitListFlow.refresh()
+    fun refresh() = positionFLow.refresh()
 }
