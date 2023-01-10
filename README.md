@@ -3,8 +3,8 @@ Document Questions:
 - Do you expect involvement of other dev teams (besides mobile)?
 
   Yes, 
-  1-The collar bluetooth api and its charactristic UUID should come from device developers (or more likely documentation they prepare)
-  2-UI/UX is usually created by an Experience team
+  The collar bluetooth api and its charactristic UUID should come from device developers (or more likely documentation they prepare).
+  UI/UX is usually created by an Experience team.
   
   
 - How would you setup the deployment to the play store
