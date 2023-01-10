@@ -28,6 +28,7 @@ import com.temp.tractivetest.R
 import com.temp.tractivetest.data.CallResult
 import com.temp.tractivetest.ui.theme.Proximity
 import com.temp.tractivetest.ui.theme.Teal200
+import com.temp.tractivetest.ui.theme.Teal200ST
 import com.temp.tractivetest.ui.theme.TextError
 import com.temp.tractivetest.viewmodel.HomeViewModel
 
@@ -58,7 +59,7 @@ private fun HomePage(navController: NavHostController, callResult: State<CallRes
         callResult.value.let {
             when (it.status) {
                 CallResult.Status.SUCCESS -> {
-                    ProximityView(distance = it.data)
+                    ProximityView(distance = it.data ?: 0)
                 }
                 CallResult.Status.LOADING, CallResult.Status.IDLE -> {
                     LoadingView()
@@ -80,7 +81,7 @@ private fun HomePage(navController: NavHostController, callResult: State<CallRes
 }
 
 @Composable
-private fun ProximityView(distance: Int?) {
+private fun ProximityView(distance: Int) {
     ConstraintLayout(modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1f)) {
@@ -97,7 +98,18 @@ private fun ProximityView(distance: Int?) {
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 })
-        val dividedDistance = distance?.div(5) ?: 0
+        Box(modifier = Modifier
+            .border(distance.dp, Teal200ST, CircleShape)
+            .background(Color.Transparent)
+            .constrainAs(createRef()) {
+                top.linkTo(image.top, -distance.dp)
+                bottom.linkTo(image.bottom, -distance.dp)
+                start.linkTo(image.start, -distance.dp)
+                end.linkTo(image.end, -distance.dp)
+                width = Dimension.fillToConstraints
+                height = Dimension.fillToConstraints
+            })
+        val dividedDistance = distance.div(5)
         for (i: Int in 1..dividedDistance) {
             Box(modifier = Modifier
                 .clip(CircleShape)
