@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.temp.tractivetest.R
 import com.temp.tractivetest.data.CallResult
+import com.temp.tractivetest.ui.SemanticsUtil
+import com.temp.tractivetest.ui.StringId
 import com.temp.tractivetest.ui.theme.Proximity
 import com.temp.tractivetest.ui.theme.Teal200
 import com.temp.tractivetest.ui.theme.Teal200ST
@@ -112,6 +115,7 @@ private fun ProximityView(distance: Int) {
         val dividedDistance = distance.div(5)
         for (i: Int in 1..dividedDistance) {
             Box(modifier = Modifier
+                .semantics { StringId = SemanticsUtil.getProximitySemantics(i) }
                 .clip(CircleShape)
                 .border(2.dp, Proximity, CircleShape)
                 .background(Color.Transparent)
