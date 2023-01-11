@@ -5,6 +5,8 @@ import com.temp.tractivetest.data.DataSource
 import com.temp.tractivetest.data.PetCalls
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 
@@ -16,12 +18,16 @@ class DataSourceTest {
     @Test
     fun testPetCall() {
         coEvery { api.getPosition() }.returns(CallResult.success(1))
-        val datasource = DataSource(PetCalls())
+        val datasource = DataSource(api)
         val result = datasource.getPetPosition()
         runBlocking {
-            result.collect {
-                assertEquals(CallResult.Status.SUCCESS, it.status)
-                assertEquals(1, it.data)
+            result.take(2).collectIndexed{ index, value ->
+                if(index == 0) {
+                    assertEquals(CallResult.Status.LOADING, value.status)
+                }else {
+                    assertEquals(CallResult.Status.SUCCESS, value.status)
+                    assertEquals(1, value.data)
+                }
             }
         }
     }
