@@ -27,6 +27,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.temp.tractivetest.R
 import com.temp.tractivetest.data.CallResult
+import com.temp.tractivetest.data.PetCalls
 import com.temp.tractivetest.ui.SemanticsUtil
 import com.temp.tractivetest.ui.StringId
 import com.temp.tractivetest.ui.theme.Proximity
@@ -43,8 +44,9 @@ import com.temp.tractivetest.viewmodel.HomeViewModel
 @Composable
 fun HomeComponent(navController: NavHostController) {
     val viewModel: HomeViewModel = hiltViewModel()
+    val pet = viewModel.pet
     val callResult = viewModel.position.collectAsStateWithLifecycle(CallResult.idle())
-    HomePage(navController, callResult) {
+    HomePage(navController, callResult, pet) {
         viewModel.refresh()
     }
 }
@@ -56,13 +58,13 @@ fun HomeComponent(navController: NavHostController) {
  * @param refresh handle to call data refresh
  */
 @Composable
-private fun HomePage(navController: NavHostController, callResult: State<CallResult<Int>>, refresh: () -> Unit) {
+private fun HomePage(navController: NavHostController, callResult: State<CallResult<Int>>, pet: PetCalls.Pet, refresh: () -> Unit) {
     Column(modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally) {
         callResult.value.let {
             when (it.status) {
                 CallResult.Status.SUCCESS -> {
-                    ProximityView(distance = it.data ?: 0)
+                    ProximityView(distance = it.data ?: 0, pet = pet)
                 }
                 CallResult.Status.LOADING, CallResult.Status.IDLE -> {
                     LoadingView()
@@ -84,12 +86,12 @@ private fun HomePage(navController: NavHostController, callResult: State<CallRes
 }
 
 @Composable
-private fun ProximityView(distance: Int) {
+private fun ProximityView(distance: Int, pet: PetCalls.Pet) {
     ConstraintLayout(modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1f)) {
         val (image) = createRefs()
-        Image(painter = painterResource(id = R.drawable.ic_pet),
+        Image(painter = painterResource(id = pet.image),
             contentDescription = stringResource(id = R.string.desc_img_home),
             modifier = Modifier
                 .size(dimensionResource(id = R.dimen.imageSize))

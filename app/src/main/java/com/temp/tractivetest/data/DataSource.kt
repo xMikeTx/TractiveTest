@@ -28,6 +28,10 @@ class DataSource @Inject constructor(
         }
     }
 
+    fun getPet(): PetCalls.Pet {
+        return api.getPet()
+    }
+
     /**
      * Helper method that executes and emits api calls as a single Flow
      * @param apiCall method containing api call invocation
@@ -55,4 +59,5 @@ class DataSource @Inject constructor(
             } catch (_: CancellationException) {
             }
         }.onStart { emit(CallResult.loading()) }
+
 }

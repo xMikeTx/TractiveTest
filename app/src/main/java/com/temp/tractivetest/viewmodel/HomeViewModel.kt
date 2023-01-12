@@ -34,5 +34,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    val pet = dataSource.getPet()
+
     fun refresh() = positionFLow.refresh()
 }
